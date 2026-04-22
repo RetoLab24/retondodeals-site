@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RetondoDeals – Die besten Amazon Deals täglich</title>
+  <meta name="description" content="RetondoDeals postet täglich die besten Amazon-Angebote mit mindestens 35% Rabatt. Kostenlos auf Telegram abonnieren." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --fire: #ff6b2b;
+      --fire2: #ff3d00;
+      --gold: #fbbf24;
+      --bg: #080808;
+      --card: #111111;
+      --card2: #161616;
+      --border: #222;
+      --text: #f5f5f5;
+      --muted: #777;
+      --green: #22c55e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(8,8,8,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--fire); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--fire);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 20px 80px;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.25;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb-1 { width: 600px; height: 600px; background: #ff4500; top: -200px; left: -150px; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: #ff8c00; bottom: -100px; right: -100px; animation-delay: -3s; }
+    .orb-3 { width: 300px; height: 300px; background: #dc143c; top: 30%; left: 60%; animation-delay: -5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.97); }
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 800px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,107,43,0.12);
+      color: #ff8c5a;
+      border: 1px solid rgba(255,107,43,0.25);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      margin-bottom: 32px;
+      letter-spacing: 0.03em;
+    }
+    .badge-dot {
+      width: 7px; height: 7px;
+      background: var(--fire);
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    .hero h1 {
+      font-size: clamp(48px, 9vw, 96px);
+      font-weight: 900;
+      letter-spacing: -3px;
+      line-height: 1.0;
+      margin-bottom: 24px;
+    }
+    .hero h1 .brand { color: var(--fire); }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+    .hero-sub strong { color: var(--text); }
+
+    .hero-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    .btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--fire), var(--fire2));
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 8px 32px rgba(255,61,0,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,61,0,0.5); }
+
+    .ticker-wrap {
+      width: 100%;
+      overflow: hidden;
+      background: rgba(255,107,43,0.07);
+      border-top: 1px solid rgba(255,107,43,0.15);
+      border-bottom: 1px solid rgba(255,107,43,0.15);
+      padding: 14px 0;
+      margin: 60px 0 0;
+    }
+    .ticker {
+      display: flex;
+      gap: 60px;
+      width: max-content;
+      animation: ticker 30s linear infinite;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .ticker-item .save { color: var(--fire); font-weight: 700; }
+
+    .stats-section {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat { flex: 1; min-width: 160px; text-align: center; padding: 20px; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, var(--fire), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    .section { max-width: 1100px; margin: 0 auto; padding: 100px 20px; }
+    .section-label {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fire);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      font-size: 17px;
+      max-width: 520px;
+      margin: 0 auto 64px;
+      line-height: 1.7;
+    }
+
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,107,43,0.05) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover { border-color: rgba(255,107,43,0.4); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon { font-size: 40px; margin-bottom: 20px; display: block; }
+    .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
+    .feature-card p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    .preview-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    @media (max-width: 768px) { .preview-wrap { grid-template-columns: 1fr; } }
+
+    .preview-text h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 16px; line-height: 1.1; }
+    .preview-text p { color: var(--muted); font-size: 16px; line-height: 1.8; margin-bottom: 28px; }
+
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .check-list li { display: flex; align-items: center; gap: 12px; font-size: 15px; color: #ccc; }
+    .check-icon {
+      width: 22px; height: 22px;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .phone-mockup {
+      background: #111;
+      border: 2px solid #2a2a2a;
+      border-radius: 40px;
+      padding: 24px 16px;
+      max-width: 320px;
+      margin: 0 auto;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px #333;
+    }
+    .phone-notch { width: 80px; height: 24px; background: #000; border-radius: 12px; margin: 0 auto 20px; border: 2px solid #222; }
+    .phone-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 0 4px; }
+    .tg-avatar {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--fire), #ff3d00);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .tg-info .tg-name { font-weight: 700; font-size: 15px; }
+    .tg-info .tg-subs { font-size: 12px; color: var(--muted); }
+
+    .deal-bubble {
+      background: #1e1e1e;
+      border-radius: 4px 16px 16px 16px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.7;
+      border: 1px solid #2a2a2a;
+    }
+    .deal-bubble .d-title { font-weight: 700; margin-bottom: 10px; font-size: 14px; }
+    .deal-bubble .d-old { text-decoration: line-through; color: var(--muted); }
+    .deal-bubble .d-new { color: var(--green); font-weight: 700; font-size: 18px; }
+    .deal-bubble .d-save { color: var(--fire); font-weight: 600; }
+    .deal-bubble .d-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      background: #229ED9;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .deal-time { font-size: 11px; color: var(--muted); text-align: right; margin-top: 8px; }
+
+    .cta-final {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 120px 20px;
+    }
+    .cta-final h2 {
+      position: relative;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+      line-height: 1.05;
+    }
+    .cta-final h2 em { font-style: normal; color: var(--fire); }
+    .cta-final p { position: relative; color: var(--muted); font-size: 18px; margin-bottom: 48px; }
+
+    footer { border-top: 1px solid var(--border); padding: 40px 20px; text-align: center; }
+    .footer-logo { font-size: 24px; font-weight: 900; margin-bottom: 20px; letter-spacing: -0.5px; }
+    .footer-logo span { color: var(--fire); }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 13px; color: #444; }
+    .affiliate-note { max-width: 560px; margin: 20px auto 0; font-size: 12px; color: #444; line-height: 1.7; }
+
+    .icon { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 20px; }
+      .stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Retondo<span>Deals</span></div>
+  <a href="https://t.me/RetondoDeals" class="nav-cta" target="_blank" rel="noopener">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    Telegram folgen
+  </a>
+</nav>
+
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Live – Neue Deals täglich
+    </div>
+    <h1>
+      <span>Spare </span><span class="brand">täglich</span><br>
+      <span>auf Amazon</span>
+    </h1>
+    <p class="hero-sub">
+      RetondoDeals findet automatisch Produkte mit <strong>mindestens 35% Rabatt</strong> und postet sie direkt auf Telegram — bevor sie ausverkauft sind.
+    </p>
+    <div class="hero-buttons">
+      <a href="https://t.me/RetondoDeals" class="btn-main" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Jetzt kostenlos abonnieren
+      </a>
+    </div>
+  </div>
+  <div class="ticker-wrap" style="position:absolute; bottom:0; left:0; right:0;">
+    <div class="ticker">
+      <div class="ticker-item">🔥 Sony WH-1000XM5 Kopfhörer <span class="save">−42%</span></div>
+      <div class="ticker-item">⚡ Philips Kaffeevollautomat <span class="save">−44%</span></div>
+      <div class="ticker-item">🎮 Xbox Controller <span class="save">−38%</span></div>
+      <div class="ticker-item">🏃 Nike Laufschuhe <span class="save">−51%</span></div>
+      <div class="ticker-item">💻 Samsung Monitor 27" <span class="save">−39%</span></div>
+      <div class="ticker-item">🍳 Tefal Pfannen-Set <span class="save">−47%</span></div>
+      <div class="ticker-item">📱 iPad Hülle <span class="save">−62%</span></div>
+      <div class="ticker-item">🔥 Sony WH-1000XM5 Kopfhörer <span class="save">−42%</span></div>
+      <div class="ticker-item">⚡ Philips Kaffeevollautomat <span class="save">−44%</span></div>
+      <div class="ticker-item">🎮 Xbox Controller <span class="save">−38%</span></div>
+      <div class="ticker-item">🏃 Nike Laufschuhe <span class="save">−51%</span></div>
+      <div class="ticker-item">💻 Samsung Monitor 27" <span class="save">−39%</span></div>
+      <div class="ticker-item">🍳 Tefal Pfannen-Set <span class="save">−47%</span></div>
+      <div class="ticker-item">📱 iPad Hülle <span class="save">−62%</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-section">
+  <div class="stat"><div class="stat-num">35%+</div><div class="stat-label">Garantierter Mindestrabatt</div></div>
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Automatische Überwachung</div></div>
+  <div class="stat"><div class="stat-num">0€</div><div class="stat-label">Kostenlos abonnieren</div></div>
+  <div class="stat"><div class="stat-num">90T</div><div class="stat-label">Preishistorie-Vergleich</div></div>
+</div>
+
+<div class="section">
+  <div class="section-label">Warum wir anders sind</div>
+  <h2 class="section-title">Echte Deals. Keine Tricks.</h2>
+  <p class="section-sub">Wir vergleichen jeden Preis mit der 90-Tage-Historie – kein aufgeblasener Streichpreis.</p>
+  <div class="features">
+    <div class="feature-card"><span class="feature-icon">🤖</span><h3>Vollautomatisch</h3><p>Unser System überwacht Amazon rund um die Uhr und erkennt echte Preiseinbrüche automatisch.</p></div>
+    <div class="feature-card"><span class="feature-icon">📊</span><h3>Echte Preishistorie</h3><p>Wir bauen unsere eigene Preisdatenbank auf und vergleichen immer mit dem 90-Tage-Durchschnitt. Kein Fake-Streichpreis.</p></div>
+    <div class="feature-card"><span class="feature-icon">⚡</span><h3>Blitzschnell</h3><p>Deals werden alle 30 Minuten geprüft und sofort gepostet — bevor das Angebot ausläuft.</p></div>
+    <div class="feature-card"><span class="feature-icon">🎯</span><h3>Mindestens 35% Rabatt</h3><p>Kein Produkt unter 35% Ersparnis gegenüber dem Durchschnittspreis wird gepostet.</p></div>
+    <div class="feature-card"><span class="feature-icon">📱</span><h3>Telegram — kein Spam</h3><p>Nur echte Deals, keine Werbung, keine Füller. Dein Feed bleibt sauber.</p></div>
+    <div class="feature-card"><span class="feature-icon">🛒</span><h3>Alle Kategorien</h3><p>Elektronik, Haushalt, Sport, Mode, Beauty — wir decken das gesamte Amazon.de Sortiment ab.</p></div>
+  </div>
+</div>
+
+<div class="section" style="padding-top:0;">
+  <div class="preview-wrap">
+    <div class="preview-text">
+      <div class="section-label">So funktioniert's</div>
+      <h2>Direkt auf dein Handy — fertig.</h2>
+      <p>Telegram abonnieren, Benachrichtigung aktivieren, und du verpasst keinen Deal mehr.</p>
+      <ul class="check-list">
+        <li><div class="check-icon">✓</div> Telegram-Kanal kostenlos abonnieren</li>
+        <li><div class="check-icon">✓</div> Benachrichtigungen aktivieren</li>
+        <li><div class="check-icon">✓</div> Deals kommen automatisch zu dir</li>
+        <li><div class="check-icon">✓</div> Link anklicken &amp; auf Amazon kaufen</li>
+      </ul>
+    </div>
+    <div>
+      <div class="phone-mockup">
+        <div class="phone-notch"></div>
+        <div class="phone-header">
+          <div class="tg-avatar">🔥</div>
+          <div class="tg-info">
+            <div class="tg-name">RetondoDeals</div>
+            <div class="tg-subs">Deals-Kanal</div>
+          </div>
+        </div>
+        <div class="deal-bubble">
+          <div class="d-title">🔥 Sony WH-1000XM5 Kopfhörer</div>
+          Vorher: <span class="d-old">349,00€</span><br>
+          Jetzt: <span class="d-new">199,00€</span><br>
+          <span class="d-save">💰 Du sparst: 150,00€ (43%)</span>
+          <br>
+          <a href="#" class="d-btn" onclick="return false;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            Zum Deal auf Amazon
+          </a>
+          <div class="deal-time">22.04.2026 14:32 · Werbung</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="cta-final">
+  <div class="orb orb-1" style="top:-100px; left:-200px;"></div>
+  <div class="orb orb-2" style="bottom:-100px; right:-100px;"></div>
+  <h2>Kein Deal mehr<br><em>verpassen.</em></h2>
+  <p>Kostenlos abonnieren — es dauert 10 Sekunden.</p>
+  <a href="https://t.me/RetondoDeals" class="btn-main" target="_blank" rel="noopener" style="font-size:18px; padding:18px 40px; position:relative;">
+    <svg class="icon" style="width:22px;height:22px;" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    Jetzt auf Telegram folgen
+  </a>
+</section>
+
+<footer>
+  <div class="footer-logo">Retondo<span>Deals</span></div>
+  <div class="footer-links">
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+    <a href="https://t.me/RetondoDeals" target="_blank" rel="noopener">Telegram</a>
+  </div>
+  <div class="footer-copy">© 2026 RetondoDeals</div>
+  <div class="affiliate-note">
+    Als Amazon-Partner verdiene ich an qualifizierten Käufen. Alle mit „Werbung" oder „Affiliate-Link"
+    gekennzeichneten Links sind Affiliate-Links. Der Preis für dich ändert sich dadurch nicht.
+  </div>
+</footer>
+
+</body>
+</html>
