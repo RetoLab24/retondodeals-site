@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RetondoDeals - Amazon Deals direkt auf Telegram</title>
+  <meta name="description" content="RetondoDeals findet starke Amazon-Angebote ab 35% Rabatt und postet sie direkt auf Telegram." />
+  <meta property="og:title" content="RetondoDeals - Amazon Deals direkt auf Telegram" />
+  <meta property="og:description" content="Starke Amazon-Angebote ab 35% Rabatt, übersichtlich kuratiert und direkt auf Telegram." />
+  <meta property="og:image" content="https://retondodeals.de/RETONDO.png" />
+  <meta property="og:url" content="https://retondodeals.de" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/png" href="Logo.png" />
+  <link rel="preconnect" href="https://fonts.bunny.net" />
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800,900|space-mono:400,700&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050608;
+      --panel: #0b0e12;
+      --panel-2: #11161d;
+      --line: #202833;
+      --line-2: #303a47;
+      --text: #f4f7f2;
+      --soft: #b9c2bd;
+      --muted: #747f7b;
+      --green: #8bdc24;
+      --green-dark: #4a9b12;
+      --mint: #d8ff66;
+      --blue: #39a7ff;
+      --amber: #ffb443;
+      --red: #ef4e3f;
+      --shadow: 0 30px 90px rgba(0,0,0,.55);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,.022) 1px, transparent 1px),
+        radial-gradient(circle at 78% 18%, rgba(57,167,255,.18), transparent 30%),
+        radial-gradient(circle at 18% 36%, rgba(139,220,36,.09), transparent 34%),
+        var(--bg);
+      background-size: 46px 46px, 46px 46px, auto, auto, auto;
+      color: var(--text);
+      font-family: Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(5,7,5,.18), rgba(5,7,5,.84) 72%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px);
+      mix-blend-mode: screen;
+      opacity: .48;
+      z-index: 0;
+    }
+
+    a { color: inherit; }
+    .page { position: relative; z-index: 1; }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 0 max(24px, calc((100vw - 1180px) / 2));
+      background: rgba(5,7,5,.76);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(22px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand img { height: 44px; width: auto; display: block; }
+    .brand-copy { display: none; }
+    .brand-title { font-size: 14px; font-weight: 900; letter-spacing: .02em; }
+    .brand-sub { font-family: "Space Mono", monospace; color: var(--muted); font-size: 10px; text-transform: uppercase; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .nav-links a { text-decoration: none; transition: color .18s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .telegram {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(216,255,102,.28);
+      background: linear-gradient(135deg, var(--blue), var(--green-dark));
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 12px 28px rgba(57,167,255,.22);
+      transition: transform .18s, filter .18s;
+      white-space: nowrap;
+    }
+
+    .telegram:hover { transform: translateY(-2px); filter: brightness(1.07); }
+    .telegram svg { width: 15px; height: 15px; flex: 0 0 auto; }
+
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(360px, .98fr);
+      align-items: center;
+      gap: 58px;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 116px 24px 76px;
+    }
+
+    .kicker {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(57,167,255,.24);
+      background: rgba(17,22,29,.72);
+      color: var(--mint);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      box-shadow: inset 0 0 24px rgba(57,167,255,.08);
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--blue);
+      box-shadow: 0 0 0 6px rgba(57,167,255,.12), 0 0 24px rgba(57,167,255,.65);
+    }
+
+    h1 {
+      margin-top: 26px;
+      max-width: 720px;
+      font-size: clamp(48px, 7vw, 92px);
+      line-height: .91;
+      letter-spacing: 0;
+      font-weight: 900;
+    }
+
+    h1 span {
+      display: inline-block;
+      color: var(--text);
+      text-shadow: 0 0 38px rgba(57,167,255,.22);
+    }
+
+    .hero-copy {
+      max-width: 590px;
+      margin-top: 24px;
+      color: var(--soft);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+
+    .hero-copy strong { color: var(--text); }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 34px;
+    }
+
+    .secondary {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line-2);
+      background: rgba(11,14,18,.72);
+      color: var(--soft);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+      transition: border-color .18s, color .18s, background .18s;
+    }
+
+    .secondary:hover { border-color: rgba(57,167,255,.36); color: var(--text); background: rgba(17,22,29,.9); }
+
+    .trust-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 590px;
+      margin-top: 34px;
+    }
+
+    .trust {
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(11,14,18,.72);
+      padding: 14px 13px;
+      border-radius: 8px;
+    }
+
+    .trust strong {
+      display: block;
+      color: var(--text);
+      font-size: 22px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .trust span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .radar {
+      position: relative;
+      min-height: 620px;
+    }
+
+    .scanner {
+      position: absolute;
+      inset: 0 0 auto auto;
+      width: min(100%, 520px);
+      border: 1px solid rgba(255,255,255,.09);
+      background:
+        linear-gradient(145deg, rgba(17,22,29,.9), rgba(6,8,11,.96)),
+        radial-gradient(circle at 70% 20%, rgba(57,167,255,.14), transparent 34%);
+      box-shadow: var(--shadow), inset 0 0 60px rgba(57,167,255,.035);
+      border-radius: 10px;
+      overflow: hidden;
+      transform: rotate(-1.4deg);
+    }
+
+    .scanner-head {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(5,7,5,.66);
+      font-family: "Space Mono", monospace;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .head-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--mint);
+    }
+
+    .scanner-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .scan-line {
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      align-items: center;
+      gap: 13px;
+      border: 1px solid rgba(43,59,34,.82);
+      background: rgba(5,7,5,.42);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .scan-line.featured {
+      border-color: rgba(57,167,255,.34);
+      background: linear-gradient(135deg, rgba(57,167,255,.12), rgba(5,7,5,.48));
+    }
+
+    .product-icon {
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--green);
+      background: #10151a;
+    }
+
+    .product-icon.blue { color: var(--blue); background: #07111a; }
+    .product-icon.amber { color: var(--amber); background: #1b1003; }
+    .product-icon.red { color: var(--red); background: #190908; }
+
+    .product-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+    .scan-name {
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 900;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .scan-meta {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+    }
+
+    .scan-meta b { color: var(--blue); }
+    .discount {
+      min-width: 58px;
+      text-align: center;
+      border-radius: 7px;
+      padding: 7px 9px;
+      background: var(--red);
+      color: #fff;
+      font-family: "Space Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 12px 26px rgba(239,78,63,.22);
+    }
+
+    .telegram-card {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: min(92%, 360px);
+      border: 1px solid rgba(50,168,255,.28);
+      border-radius: 10px;
+      background: #0a1117;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transform: rotate(2deg);
+    }
+
+    .telegram-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 14px;
+      background: #0d1720;
+      border-bottom: 1px solid rgba(50,168,255,.14);
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--blue), var(--green-dark));
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .telegram-head strong { display: block; font-size: 13px; }
+    .telegram-head span { display: block; color: #6d8799; font-size: 11px; }
+
+    .message {
+      padding: 14px;
+      display: grid;
+      gap: 11px;
+      color: #d9edf8;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .message-visual {
+      position: relative;
+      height: 132px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, #071a2b, #0b2540 55%, #121f2c);
+    }
+
+    .message-visual svg {
+      width: 82px;
+      height: 82px;
+      filter: drop-shadow(0 12px 24px rgba(50,168,255,.4));
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .price-now { color: var(--mint); font-size: 24px; font-weight: 900; }
+    .price-old { color: #718a9a; text-decoration: line-through; }
+    .message small { color: #718a9a; }
+
+    .ticker {
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(57,167,255,.045);
+      overflow: hidden;
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 42px;
+      width: max-content;
+      padding: 12px 0;
+      animation: marquee 36s linear infinite;
+    }
+
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--soft);
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .ticker-item b { color: var(--mint); }
+
+    .section {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 96px 24px;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(280px, .55fr);
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 13px;
+    }
+
+    h2 {
+      font-size: clamp(32px, 4.8vw, 58px);
+      line-height: 1;
+      letter-spacing: 0;
+      font-weight: 900;
+    }
+
+    .section-head p,
+    .split-copy p {
+      color: var(--soft);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border: 1px solid var(--line);
+      background: rgba(11,14,18,.76);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .proof {
+      min-height: 178px;
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .proof:last-child { border-right: none; }
+    .proof strong { font-size: 42px; line-height: 1; color: var(--blue); }
+    .proof span { color: var(--soft); font-weight: 800; }
+    .proof p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .deal-wall {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr 1fr;
+      gap: 14px;
+    }
+
+    .deal {
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      background: linear-gradient(145deg, rgba(17,22,29,.92), rgba(8,10,13,.92));
+      overflow: hidden;
+      position: relative;
+      transition: transform .18s, border-color .18s;
+    }
+
+    .deal:hover { transform: translateY(-4px); border-color: rgba(57,167,255,.34); }
+
+    .deal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 0%, rgba(57,167,255,.1), transparent 42%);
+      pointer-events: none;
+    }
+
+    .deal-top, .deal-bottom { position: relative; z-index: 1; }
+
+    .deal-art {
+      height: 106px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(5,7,5,.42);
+    }
+
+    .deal-art svg { width: 70px; height: 70px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .deal.blue { color: var(--blue); }
+    .deal.amber { color: var(--amber); }
+    .deal.green { color: var(--green); }
+
+    .deal h3 {
+      color: var(--text);
+      font-size: 17px;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+
+    .prices { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+    .prices b { color: var(--mint); font-size: 24px; }
+    .prices s { color: var(--muted); }
+
+    .deal-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 22px;
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+    }
+
+    .badge {
+      border-radius: 7px;
+      padding: 6px 8px;
+      color: #fff;
+      background: var(--red);
+      font-weight: 700;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 42px;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding-top: 92px;
+      padding-bottom: 92px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 14px;
+      align-items: start;
+      border: 1px solid var(--line);
+      background: rgba(11,14,18,.76);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .step-no {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(57,167,255,.12);
+      color: var(--blue);
+      font-family: "Space Mono", monospace;
+      font-weight: 700;
+    }
+
+    .step strong { display: block; margin-bottom: 4px; }
+    .step p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .cta {
+      position: relative;
+      overflow: hidden;
+      margin: 0 auto 40px;
+      max-width: 1180px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 10px;
+      background:
+        linear-gradient(135deg, rgba(57,167,255,.16), rgba(5,7,5,.44) 40%, rgba(139,220,36,.08)),
+        rgba(11,14,18,.88);
+      padding: 54px 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .cta h2 { max-width: 760px; margin: 0 auto 18px; }
+    .cta p { color: var(--soft); max-width: 560px; margin: 0 auto 30px; line-height: 1.7; }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--line);
+      padding: 34px 24px 44px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .footer-logo img { height: 52px; width: auto; max-width: min(82vw, 420px); margin-bottom: 18px; }
+    .footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 14px; }
+    .footer-links a { color: var(--soft); text-decoration: none; font-size: 13px; font-weight: 700; }
+    .footer-links a:hover { color: var(--text); }
+    .affiliate { max-width: 560px; margin: 12px auto 0; font-size: 11px; line-height: 1.65; color: #4d5e43; }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 112px; }
+      .radar { min-height: 590px; }
+      .scanner { position: relative; width: 100%; transform: none; }
+      .telegram-card { right: 18px; left: auto; bottom: 0; }
+      .section-head, .split { grid-template-columns: 1fr; }
+      .proof-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .proof { border-bottom: 1px solid var(--line); }
+      .proof:nth-child(2) { border-right: none; }
+      .deal-wall { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .nav { height: 64px; padding: 0 16px; }
+      .brand img { height: 34px; max-width: 185px; object-fit: contain; }
+      .nav-links a:not(.telegram) { display: none; }
+      .hero { padding: 94px 16px 54px; gap: 34px; }
+      .hero-copy { font-size: 16px; }
+      .hero-actions { align-items: stretch; }
+      .telegram, .secondary { width: 100%; }
+      .trust-row { grid-template-columns: 1fr; }
+      .radar { min-height: 620px; }
+      .scanner-grid { padding: 12px; }
+      .scan-line { grid-template-columns: 38px 1fr; }
+      .discount { grid-column: 1 / -1; text-align: left; width: fit-content; }
+      .telegram-card { width: 100%; position: relative; margin-top: 16px; right: auto; transform: none; }
+      .section { padding: 70px 16px; }
+      .proof-grid { grid-template-columns: 1fr; }
+      .proof { min-height: 148px; border-right: none; }
+      .ticker-track { animation-duration: 48s; }
+      .split { padding-top: 70px; padding-bottom: 70px; }
+      .cta { margin: 0 16px 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a class="brand" href="/">
+        <img src="RETONDO.png" alt="RetondoDeals" />
+        <span class="brand-copy">
+          <span class="brand-title">RetondoDeals</span>
+          <span class="brand-sub">Amazon Deal Radar</span>
+        </span>
+      </a>
+      <div class="nav-links">
+        <a href="#proof">Qualität</a>
+        <a href="#deals">Beispiele</a>
+        <a href="#how">Ablauf</a>
+        <a class="telegram" href="https://t.me/RetondoDeals" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14.088.071.145.18.171.325.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram folgen
+        </a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="kicker"><span class="pulse"></span> Neue Angebote direkt auf Telegram</div>
+          <h1>RetondoDeals findet <span>starke</span> Amazon-Deals.</h1>
+          <p class="hero-copy">
+            Automatisch kuratierte Angebote, klare Preise und schnelle Benachrichtigungen:
+            <strong>ab 35% Rabatt</strong> landet ein Deal direkt im Telegram-Kanal.
+          </p>
+          <div class="hero-actions">
+            <a class="telegram" href="https://t.me/RetondoDeals" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14.088.071.145.18.171.325.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              Kostenlos abonnieren
+            </a>
+            <a class="secondary" href="#proof">Warum es sich lohnt</a>
+          </div>
+          <div class="trust-row" aria-label="RetondoDeals Fakten">
+            <div class="trust"><strong>35%+</strong><span>Mindest-Rabatt für Deals</span></div>
+            <div class="trust"><strong>klar</strong><span>Preis, Ersparnis und Link</span></div>
+            <div class="trust"><strong>0€</strong><span>Kostenlos per Telegram</span></div>
+          </div>
+        </div>
+
+        <div class="radar" aria-label="Deal-Radar Vorschau">
+          <div class="scanner">
+            <div class="scanner-head">
+              <span>Retondo dealboard</span>
+              <span class="head-status"><span class="pulse"></span> aktiv</span>
+            </div>
+            <div class="scanner-grid">
+              <div class="scan-line featured">
+                <div class="product-icon blue">
+                  <svg viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M4 13v4a2 2 0 0 0 2 2h1v-7H6a2 2 0 0 0-2 2"/><path d="M20 13v4a2 2 0 0 1-2 2h-1v-7h1a2 2 0 0 1 2 2"/></svg>
+                </div>
+                <div>
+                  <div class="scan-name">Sony WH-1000XM5 Kopfhörer</div>
+                  <div class="scan-meta"><span>199,00€</span><span>statt 349,00€</span><b>geprüft</b></div>
+                </div>
+                <div class="discount">-43%</div>
+              </div>
+              <div class="scan-line">
+                <div class="product-icon amber">
+                  <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg>
+                </div>
+                <div>
+                  <div class="scan-name">Philips Kaffeevollautomat</div>
+                  <div class="scan-meta"><span>269,99€</span><span>statt 489,00€</span><b>geprüft</b></div>
+                </div>
+                <div class="discount">-44%</div>
+              </div>
+              <div class="scan-line">
+                <div class="product-icon">
+                  <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.8 3.8z"/></svg>
+                </div>
+                <div>
+                  <div class="scan-name">Bosch Akkuschrauber Set</div>
+                  <div class="scan-meta"><span>89,99€</span><span>statt 139,00€</span><b>geprüft</b></div>
+                </div>
+                <div class="discount">-35%</div>
+              </div>
+              <div class="scan-line">
+                <div class="product-icon red">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="M8 12h8"/></svg>
+                </div>
+                <div>
+                  <div class="scan-name">Samsung Monitor 27 Zoll</div>
+                  <div class="scan-meta"><span>149,00€</span><span>statt 249,00€</span><b>geprüft</b></div>
+                </div>
+                <div class="discount">-40%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="telegram-card">
+            <div class="telegram-head">
+              <div class="avatar">R</div>
+              <div><strong>RetondoDeals</strong><span>gerade eben auf Telegram</span></div>
+            </div>
+            <div class="message">
+              <div class="message-visual">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <path d="M18 50 C18 28 31 16 50 16 C69 16 82 28 82 50" fill="none" stroke="#32a8ff" stroke-width="4.5" stroke-linecap="round"/>
+                  <path d="M23 50 C23 33 35 22 50 22 C65 22 77 33 77 50" fill="none" stroke="#89d1ff" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>
+                  <rect x="9" y="46" width="16" height="26" rx="8" fill="#185c9b"/>
+                  <rect x="75" y="46" width="16" height="26" rx="8" fill="#185c9b"/>
+                  <rect x="11" y="49" width="12" height="20" rx="6" fill="#32a8ff"/>
+                  <rect x="77" y="49" width="12" height="20" rx="6" fill="#32a8ff"/>
+                </svg>
+              </div>
+              <strong>Sony WH-1000XM5 Noise Cancelling Kopfhörer</strong>
+              <div class="price-row"><span class="price-now">199,00€</span><span class="price-old">349,00€</span></div>
+              <small>Werbung / Affiliate-Link. Preise können sich ändern.</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-track">
+          <span class="ticker-item">Sony WH-1000XM5 <b>-43%</b></span>
+          <span class="ticker-item">Philips Kaffeevollautomat <b>-44%</b></span>
+          <span class="ticker-item">Bosch Akkuschrauber <b>-35%</b></span>
+          <span class="ticker-item">Samsung Monitor <b>-40%</b></span>
+          <span class="ticker-item">Tefal Pfannen-Set <b>-47%</b></span>
+          <span class="ticker-item">Xbox Controller <b>-38%</b></span>
+          <span class="ticker-item">Sony WH-1000XM5 <b>-43%</b></span>
+          <span class="ticker-item">Philips Kaffeevollautomat <b>-44%</b></span>
+          <span class="ticker-item">Bosch Akkuschrauber <b>-35%</b></span>
+          <span class="ticker-item">Samsung Monitor <b>-40%</b></span>
+          <span class="ticker-item">Tefal Pfannen-Set <b>-47%</b></span>
+          <span class="ticker-item">Xbox Controller <b>-38%</b></span>
+        </div>
+      </div>
+
+      <section class="section" id="proof">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Deal-Qualität</div>
+            <h2>Weniger Rauschen, mehr echte Chancen.</h2>
+          </div>
+          <p>RetondoDeals konzentriert sich auf das, was Nutzer wirklich brauchen: klare Deal-Daten, sichtbare Ersparnis, transparente Affiliate-Kennzeichnung und den Hinweis, dass Preise sich jederzeit ändern können.</p>
+        </div>
+        <div class="proof-grid">
+          <div class="proof"><strong>01</strong><span>Klare Auswahl</span><p>Im Feed landen nur Angebote, die als Deal relevant sind.</p></div>
+          <div class="proof"><strong>02</strong><span>Transparente Preise</span><p>Jeder Post zeigt aktuellen Preis, Vergleichspreis und Ersparnis.</p></div>
+          <div class="proof"><strong>03</strong><span>Sauber gekennzeichnet</span><p>Affiliate-Links werden offen als Werbung gekennzeichnet.</p></div>
+          <div class="proof"><strong>04</strong><span>Schneller Feed</span><p>Deals werden kompakt auf Telegram gepostet, ohne Website-Account.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="deals">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Beispiel-Deals</div>
+            <h2>Kompakt genug für Telegram. Klar genug zum Kaufen.</h2>
+          </div>
+          <p>Die Beispiele zeigen den Stil der Posts: Produkt, neuer Preis, Vergleichspreis, Rabatt und eine kurze Weiterleitung.</p>
+        </div>
+        <div class="deal-wall">
+          <article class="deal blue">
+            <div class="deal-top">
+              <div class="deal-art"><svg viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M4 13v4a2 2 0 0 0 2 2h1v-7H6a2 2 0 0 0-2 2"/><path d="M20 13v4a2 2 0 0 1-2 2h-1v-7h1a2 2 0 0 1 2 2"/></svg></div>
+              <h3>Sony WH-1000XM5 Noise Cancelling Kopfhörer</h3>
+              <div class="prices"><b>199,00€</b><s>349,00€</s></div>
+            </div>
+            <div class="deal-bottom"><span>Elektronik</span><span class="badge">-43%</span></div>
+          </article>
+          <article class="deal amber">
+            <div class="deal-top">
+              <div class="deal-art"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg></div>
+              <h3>Philips 3200 Series Kaffeevollautomat</h3>
+              <div class="prices"><b>269,99€</b><s>489,00€</s></div>
+            </div>
+            <div class="deal-bottom"><span>Haushalt</span><span class="badge">-44%</span></div>
+          </article>
+          <article class="deal green">
+            <div class="deal-top">
+              <div class="deal-art"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.8 3.8z"/></svg></div>
+              <h3>Bosch Professional Akkuschrauber Set</h3>
+              <div class="prices"><b>89,99€</b><s>139,00€</s></div>
+            </div>
+            <div class="deal-bottom"><span>Werkzeug</span><span class="badge">-35%</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split" id="how">
+        <div class="split-copy">
+          <div class="eyebrow">Ablauf</div>
+          <h2>Einmal folgen, neue Deals automatisch bekommen.</h2>
+          <p>Du brauchst keinen Account auf der Website. Der Feed läuft dort, wo schnelle Benachrichtigungen sinnvoll sind: direkt in Telegram.</p>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="step-no">01</div><div><strong>Telegram-Kanal öffnen</strong><p>RetondoDeals abonnieren, kostenlos und ohne Registrierung auf der Website.</p></div></div>
+          <div class="step"><div class="step-no">02</div><div><strong>Benachrichtigungen aktivieren</strong><p>So bekommst du neue Deals schnell genug, bevor Angebote auslaufen.</p></div></div>
+          <div class="step"><div class="step-no">03</div><div><strong>Deal ansehen und entscheiden</strong><p>Jede Nachricht zeigt Preis, Ersparnis und den gekennzeichneten Link.</p></div></div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="eyebrow">Kostenloser Deal-Feed</div>
+        <h2>Wenn ein echter Deal auftaucht, soll er zuerst bei dir landen.</h2>
+        <p>Folge RetondoDeals auf Telegram und bekomme neue Angebote direkt in deinen Feed.</p>
+        <a class="telegram" href="https://t.me/RetondoDeals" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14.088.071.145.18.171.325.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Jetzt Telegram öffnen
+        </a>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-logo"><img src="RETONDO.png" alt="RetondoDeals" /></div>
+    <div class="footer-links">
+      <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html">Datenschutz</a>
+      <a href="https://t.me/RetondoDeals" target="_blank" rel="noopener">Telegram</a>
+    </div>
+    <div>© 2026 RetondoDeals</div>
+    <div class="affiliate">Als Amazon-Partner verdiene ich an qualifizierten Käufen. Alle gekennzeichneten Links sind Affiliate-Links. Der Preis für dich ändert sich dadurch nicht.</div>
+  </footer>
+</body>
+</html>
